@@ -36,7 +36,11 @@ int main()
 
   char* funN = unpackFile(fn);
   if(funN != "unpkdFile.txt")
-    printf("%s\n", funN);
+    {
+      printf("%s\n", funN);
+      fclose(pF);
+      return 0;
+    }
 
   FILE* nF = fopen(funN, "rb");
   if(!nF)
