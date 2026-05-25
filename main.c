@@ -7,5 +7,9 @@ char* unpackFile(const char* fNameOrPath);
 
 int main()
 {
+  char* fn = packFile("file.txt");
 
+  char* funN = unpackFile(fn);
+
+  return 0;
 }
