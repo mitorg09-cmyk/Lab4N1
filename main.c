@@ -5,9 +5,14 @@
 char* packFile(const char* fNameOrPath);
 char* unpackFile(const char* fNameOrPath);
 
+//tests des
+// file.txt - just combination of eng lits and numbers
+// file1.txt - NOT ASCII SYMBOL (russian)
+// file2.txt - 24 symbols (3 symbols packed, tail len == 0)
+
 int main()
 {
-  char* fn = packFile("file.txt");
+  char* fn = packFile("file2.txt");
   if(fn != "pkdFile.txt")
     printf("%s\n", fn);
 
@@ -39,6 +44,7 @@ char* packFile(const char* fNameOrPath)
     els = elsOrigPtr;
     for(i = 0; i < 8 && fscanf(pF, "%c", els + i) != -1; i++)
     {
+      // printf("els[i] is %d\n", els[i]);
       if((els[i] & 128) != 0)
       {
         // printf("err el = %b\n", els[i]);
@@ -53,6 +59,7 @@ char* packFile(const char* fNameOrPath)
     }
     if(i == 8)
     {
+      // printf("%s\n", els);
       for(size_t j = 1; j < 8; j++)
       {
         els[j] = els[j] | (els[0] << (8 - j)) & 128;
@@ -64,6 +71,8 @@ char* packFile(const char* fNameOrPath)
     else
     {
       els[i] = '\0';
+      // printf("i is %d\n", i);
+      // printf("els[i] is %d\n", els[i]);
       teilLen += i;
     }
 
@@ -74,7 +83,7 @@ char* packFile(const char* fNameOrPath)
   }while(i != 0);
 
   rewind(nF);
-  //printf("teLen = %d\n", teilLen);
+  printf("teLen = %d\n", teilLen);
   // teilLen = '5';
   fprintf(nF, "%c", teilLen);
 
