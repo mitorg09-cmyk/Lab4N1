@@ -4,6 +4,7 @@
 
 char* packFile(const char* fNameOrPath);
 char* unpackFile(const char* fNameOrPath);
+char* AllNormalASCIISymbsCreate();
 
 //tests des
 // file.txt - just combination of eng lits and numbers
@@ -12,15 +13,53 @@ char* unpackFile(const char* fNameOrPath);
 // file3.txt - 30 symbols (3 symbols packed, tail len == 7)
 // file4.txt - 7 symbols (0 symbols packed, tail == 7)
 // file5.txt - long text
+// file7.txt - empty file
+
 
 int main()
 {
-  char* fn = packFile("file5.txt");
+  char* Name = "file.txt";
+
+  // Name = AllNormalASCIISymbsCreate(); // file6 - ALL NORMAL ASCII SYMBS
+
+  FILE* pF = fopen(Name, "rb");
+  if(!pF)
+    return 0;
+
+  char* fn = packFile(Name);
   if(fn != "pkdFile.txt")
     printf("%s\n", fn);
 
   char* funN = unpackFile(fn);
+  if(funN != "unpkdFile.txt")
+    printf("%s\n", funN);
 
+  FILE* nF = fopen(funN, "rb");
+  if(!nF)
+  {
+    fclose(pF);
+    return 0;
+  }
+
+
+  // TESTER
+  char el1 = 0;
+  char el2 = 0;
+  while((fscanf(pF, "%c", &el1) != -1) && (fscanf(nF, "%c", &el2) != -1))
+  {
+    if(el1 != el2)
+    {
+      fclose(pF);
+      fclose(nF);
+      printf("NO\n");
+        return 0;
+    }
+  }
+  printf("YES\n");
+  // TESTER END
+
+  fclose(pF);
+  fclose(nF);
   return 0;
 }
 
@@ -148,4 +187,18 @@ char* unpackFile(const char* fNameOrPath)
   fclose(pkdF);
 
   return "unpkdFile.txt";
+}
+
+char* AllNormalASCIISymbsCreate()
+{
+  FILE* pF = fopen("file6.txt", "wb");
+  if(!pF)
+    return NULL;
+
+  for(unsigned char i = 1; i < 128; i++)
+    fprintf(pF, "%c", (char)i);
+
+  fclose(pF);
+
+  return "file6.txt";
 }
