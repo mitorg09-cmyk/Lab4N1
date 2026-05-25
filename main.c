@@ -27,6 +27,38 @@ char* packFile(const char* fNameOrPath)
     return NULL;
   }
 
+  char elsOrigPtr[9] = {};
+  char* els = elsOrigPtr;
+  size_t i = 0;
+  char teilLen = 0; // Using as integer
+  fprintf(nF, "%c", 1); // Reseved for teilLen
+  do
+  {
+    els = elsOrigPtr;
+    for(i = 0; i < 8 && fscanf(pF, "%c", els + i) != -1; i++);
+    if(i == 8)
+    {
+      for(size_t j = 1; j < 8; j++)
+      {
+        els[j] = els[j] | (els[0] << (8 - j)) & 128;
+      }
+      els[0] = 0;
+      els[8] = '\0';
+      els = els + 1;
+    }
+    else
+    {
+      els[i] = '\0';
+      teilLen += i;
+    }
+
+    fprintf(nF, "%s", els);
+  }while(i != 0);
+
+  rewind(nF);
+  printf("teLen = %d\n", teilLen);
+  fprintf(nF, "%c", teilLen);
+
   fclose(pF);
   fclose(nF);
 
