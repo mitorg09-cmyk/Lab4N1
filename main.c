@@ -78,6 +78,40 @@ char* unpackFile(const char* fNameOrPath)
     return NULL;
   }
 
+  char teilLen = 0;
+  fscanf(pkdF, "%c", &teilLen); // Used as integer
+
+  char el = 0;
+  char unpkdEl = 0;
+  size_t ix = 0;
+  char elsOrigPtr[9] = {};
+  char* els = elsOrigPtr;
+  els[8] = '\0';
+  while(fscanf(pkdF, "%c", &el) != -1)
+  {
+    unpkdEl = unpkdEl | ((el & 128) && 1) << ix;
+    els[ix + 1] = el & 127;
+    ix++;
+    if(ix == 7)
+    {
+      els[0] = unpkdEl;
+      if(teilLen)
+        if(fscanf(pkdF, "%c", &el) == -1)
+        {
+          els++;
+        }
+        else
+          fseek(pkdF, -1, SEEK_CUR);
+      fprintf(unpkdF, "%s", els);
+      ix = 0;
+      unpkdEl = 0;
+    }
+  }
+  els[ix + 1] = '\0';
+  els[0] = 0;
+  els++;
+  fprintf(unpkdF, "%s", els);
+
   fclose(unpkdF);
   fclose(pkdF);
 
