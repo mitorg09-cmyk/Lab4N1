@@ -9,10 +9,13 @@ char* unpackFile(const char* fNameOrPath);
 // file.txt - just combination of eng lits and numbers
 // file1.txt - NOT ASCII SYMBOL (russian)
 // file2.txt - 24 symbols (3 symbols packed, tail len == 0)
+// file3.txt - 30 symbols (3 symbols packed, tail len == 7)
+// file4.txt - 7 symbols (0 symbols packed, tail == 7)
+// file5.txt - long text
 
 int main()
 {
-  char* fn = packFile("file2.txt");
+  char* fn = packFile("file5.txt");
   if(fn != "pkdFile.txt")
     printf("%s\n", fn);
 
