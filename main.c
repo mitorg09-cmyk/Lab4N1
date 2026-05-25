@@ -2,9 +2,9 @@
 #include <string.h>
 #include <unistd.h>
 
-char* packFile(const char* fNameOrPath);
-char* unpackFile(const char* fNameOrPath);
-char* AllNormalASCIISymbsCreate();
+int packFile(const char* fNameOrPath, const char* OutputName);
+int unpackFile(const char* fNameOrPath, const char* OutputName);
+int AllNormalASCIISymbsCreate();
 
 //tests des
 // file.txt - just combination of eng lits and numbers
@@ -18,31 +18,31 @@ char* AllNormalASCIISymbsCreate();
 
 int main()
 {
-  char* Name = "file6.txt";
+  char* Name = "file.txt";
 
-  // Name = AllNormalASCIISymbsCreate(); // file6 - ALL NORMAL ASCII SYMBS - 127 symbols
+  int code = AllNormalASCIISymbsCreate(); // file6 - ALL NORMAL ASCII SYMBS - 128 symbols
 
   FILE* pF = fopen(Name, "rb");
   if(!pF)
     return 0;
 
-  char* fn = packFile(Name);
-  if(fn != "pkdFile.txt")
+  int fn = packFile(Name, "pkdFile.txt");
+  if(fn != 0)
     {
-      printf("%s\n", fn);
+      printf("%d\n", fn);
       fclose(pF);
       return 0;
     }
 
-  char* funN = unpackFile(fn);
-  if(funN != "unpkdFile.txt")
+  int funN = unpackFile("pkdFile.txt", "unpkdFile.txt");
+  if(funN != 0)
     {
-      printf("%s\n", funN);
+      printf("%d\n", funN);
       fclose(pF);
       return 0;
     }
 
-  FILE* nF = fopen(funN, "rb");
+  FILE* nF = fopen("unpkdFile.txt", "rb");
   if(!nF)
   {
     fclose(pF);
@@ -73,17 +73,17 @@ int main()
   return 0;
 }
 
-char* packFile(const char* fNameOrPath)
+int packFile(const char* fNameOrPath, const char* OutputName)
 {
-  if(!fNameOrPath) return NULL;
+  if(!fNameOrPath) return -1;
 
   FILE* pF = fopen(fNameOrPath, "rb");
-  if(!pF) return NULL;
+  if(!pF) return -1;
   FILE* nF = fopen("pkdFile.txt", "wb");
   if(!nF)
   {
     fclose(pF);
-    return NULL;
+    return -1;
   }
 
   char elsOrigPtr[9] = {}; // Fixed bufer
@@ -97,6 +97,7 @@ char* packFile(const char* fNameOrPath)
     for(i = 0; i < 8 && fscanf(pF, "%c", els + i) != -1; i++) // Read 8 elements
     {
       // printf("els[i] is %d\n", els[i]);
+
       if((els[i] & 128) != 0) // ASCII checking
       {
         // printf("err el = %b\n", els[i]);
@@ -104,7 +105,7 @@ char* packFile(const char* fNameOrPath)
         fclose(pF);
         remove("pkdFile");
         fclose(nF);
-        return "ERROR: NOT ASCII SYMBOL";
+        return 1;
       }
       // else
       //   printf("normal el = %b\n", els[i]);
@@ -119,10 +120,11 @@ char* packFile(const char* fNameOrPath)
       els[0] = 0;
       els[8] = '\0'; // Hardcode setting stop-zero
       els = els + 1; // Cutting first element wich was packed
+      i--;
     }
     else // For tail
     {
-      els[i] = '\0'; // Cutting end of tail string
+      // els[i] = '\0'; // Cutting end of tail string
       // printf("i is %d\n", i);
       // printf("els[i] is %d\n", els[i]);
       teilLen += i; // Setting tail len
@@ -130,7 +132,10 @@ char* packFile(const char* fNameOrPath)
 
     // els[i] = '\0';
 
-    fprintf(nF, "%s", els); // Writing to pkdFile
+    for(short k = 0; k < i; k++) // Writing to pkdFile
+    {
+      fprintf(nF, "%c", els[k]);
+    }
     // printf("%s\n", els);
   }while(i != 0);
 
@@ -142,20 +147,20 @@ char* packFile(const char* fNameOrPath)
   fclose(pF);
   fclose(nF);
 
-  return "pkdFile.txt";
+  return 0;
 }
 
-char* unpackFile(const char* fNameOrPath)
+int unpackFile(const char* fNameOrPath, const char* OutputName)
 {
-  if(!fNameOrPath) return NULL;
+  if(!fNameOrPath) return -1;
 
   FILE* pkdF = fopen(fNameOrPath, "rb");
-  if(!pkdF) return NULL;
+  if(!pkdF) return -1;
   FILE* unpkdF = fopen("unpkdFile.txt", "wb");
   if(!unpkdF)
   {
     fclose(pkdF);
-    return NULL;
+    return -1;
   }
 
   char teilLen = 0;
@@ -180,35 +185,42 @@ char* unpackFile(const char* fNameOrPath)
         {
           els++; // Cutting start tail string
           //printf("+eah\n");
+          ix--;
         }
         else
           fseek(pkdF, -1, SEEK_CUR);
-      fprintf(unpkdF, "%s", els); // Writing to unpkdFile
+      for(short k = 0; k < ix + 1; k++) // Writing to pkdFile
+      {
+        fprintf(unpkdF, "%c", els[k]);
+      } // Writing to unpkdFile
       ix = 0;
       unpkdEl = 0;
     }
   }
-  els[ix + 1] = '\0'; // Setting end of tail string
-  els[0] = 0;
+  // els[ix + 1] = '\0'; // Setting end of tail string
+  // els[0] = 0;
   els++; // Cutting start of tail string
-  fprintf(unpkdF, "%s", els); // Writing to unpkdFile
+  for(short k = 0; k < ix; k++) // Writing to pkdFile
+  {
+    fprintf(unpkdF, "%c", els[k]);
+  } // Writing to unpkdFile
 
   fclose(unpkdF);
   fclose(pkdF);
 
-  return "unpkdFile.txt";
+  return 0;
 }
 
-char* AllNormalASCIISymbsCreate()
+int AllNormalASCIISymbsCreate()
 {
   FILE* pF = fopen("file6.txt", "wb");
   if(!pF)
-    return NULL;
+    return -1;
 
-  for(unsigned char i = 1; i < 128; i++)
+  for(unsigned char i = 0; i < 128; i++)
     fprintf(pF, "%c", (char)i);
 
   fclose(pF);
 
-  return "file6.txt";
+  return 0;
 }
