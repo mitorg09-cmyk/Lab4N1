@@ -52,11 +52,15 @@ char* packFile(const char* fNameOrPath)
       teilLen += i;
     }
 
+    // els[i] = '\0';
+
     fprintf(nF, "%s", els);
+    // printf("%s\n", els);
   }while(i != 0);
 
   rewind(nF);
-  printf("teLen = %d\n", teilLen);
+  //printf("teLen = %d\n", teilLen);
+  // teilLen = '5';
   fprintf(nF, "%c", teilLen);
 
   fclose(pF);
@@ -99,6 +103,7 @@ char* unpackFile(const char* fNameOrPath)
         if(fscanf(pkdF, "%c", &el) == -1)
         {
           els++;
+          //printf("+eah\n");
         }
         else
           fseek(pkdF, -1, SEEK_CUR);
