@@ -28,7 +28,11 @@ int main()
 
   char* fn = packFile(Name);
   if(fn != "pkdFile.txt")
-    printf("%s\n", fn);
+    {
+      printf("%s\n", fn);
+      fclose(pF);
+      return 0;
+    }
 
   char* funN = unpackFile(fn);
   if(funN != "unpkdFile.txt")
