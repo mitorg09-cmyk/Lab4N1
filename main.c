@@ -7,7 +7,7 @@ char* unpackFile(const char* fNameOrPath);
 
 int main()
 {
-  char* fn = packFile("file1.txt");
+  char* fn = packFile("file.txt");
   if(fn != "pkdFile.txt")
     printf("%s\n", fn);
 
@@ -39,11 +39,17 @@ char* packFile(const char* fNameOrPath)
     els = elsOrigPtr;
     for(i = 0; i < 8 && fscanf(pF, "%c", els + i) != -1; i++)
     {
-      if(els[i] & 128 != 0)
+      if((els[i] & 128) != 0)
+      {
+        // printf("err el = %b\n", els[i]);
+        // printf("older bit of el = %b\n", els[i] & 128);
         fclose(pF);
         remove("pkdFile");
         fclose(nF);
         return "ERROR: NOT ASCII SYMBOL";
+      }
+      // else
+      //   printf("normal el = %b\n", els[i]);
     }
     if(i == 8)
     {
