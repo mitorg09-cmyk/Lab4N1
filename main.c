@@ -60,7 +60,7 @@ int main()
       fclose(pF);
       fclose(nF);
       printf("NO\n");
-        return 0;
+      return 0;
     }
   }
   printf("YES\n");
