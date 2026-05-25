@@ -7,7 +7,9 @@ char* unpackFile(const char* fNameOrPath);
 
 int main()
 {
-  char* fn = packFile("file.txt");
+  char* fn = packFile("file1.txt");
+  if(fn != "pkdFile.txt")
+    printf("%s\n", fn);
 
   char* funN = unpackFile(fn);
 
@@ -35,7 +37,14 @@ char* packFile(const char* fNameOrPath)
   do
   {
     els = elsOrigPtr;
-    for(i = 0; i < 8 && fscanf(pF, "%c", els + i) != -1; i++);
+    for(i = 0; i < 8 && fscanf(pF, "%c", els + i) != -1; i++)
+    {
+      if(els[i] & 128 != 0)
+        fclose(pF);
+        remove("pkdFile");
+        fclose(nF);
+        return "ERROR: NOT ASCII SYMBOL";
+    }
     if(i == 8)
     {
       for(size_t j = 1; j < 8; j++)
